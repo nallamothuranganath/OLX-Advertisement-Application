@@ -1,0 +1,52 @@
+server:
+  port: 9000
+
+spring: 
+
+  application:
+     name: advertise-service
+  zipkin:
+     base-url: http://localhost:9411     
+  config:
+    import: configserver:http://localhost:8888       
+  cloud:
+    discovery:
+      enabled: true  
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+      base-path: "/olx-advertise-monitor"  
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoint:
+    health:
+      show-details: always
+      
+resilience4j:
+  circuitbreaker:
+    instances:
+       STATUS-FROM-MASTER-DATA-SERVICE:
+        registerHealthIndicator: true
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        failureRateThreshold: 50
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        waitDurationInOpenState: 5s
+       TOKEN-VALIDATION-SERVICE:
+        registerHealthIndicator: true
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        failureRateThreshold: 50
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        waitDurationInOpenState: 5s
+        
+    
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    hostname: localhost  
